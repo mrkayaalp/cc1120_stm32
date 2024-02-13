@@ -4,4 +4,13 @@
 #include "cc112x_spi.h"
 #include "cc112x_def.h"
 
+
+
+
+
+
+
+
+void registerConfig(RfConfig config);
+
 #endif

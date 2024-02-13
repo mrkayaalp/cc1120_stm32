@@ -80,13 +80,7 @@ extern "C" {
 #define STATUS_FIFO_BYTES_AVAILABLE_BM  0x0F
 
 
-typedef struct
-{
-  uint16  addr;
-  uint8   data;
-}registerSetting_t;
 
-typedef uint8 rfStatus_t;
 
 /******************************************************************************
  * PROTOTYPES

@@ -9,6 +9,7 @@ C_SRCS += \
 ../Core/Src/cc112x_spi.c \
 ../Core/Src/gpio.c \
 ../Core/Src/hal_spi_rf_trxeb.c \
+../Core/Src/i2c.c \
 ../Core/Src/main.c \
 ../Core/Src/spi.c \
 ../Core/Src/stm32f4xx_hal_msp.c \
@@ -22,6 +23,7 @@ OBJS += \
 ./Core/Src/cc112x_spi.o \
 ./Core/Src/gpio.o \
 ./Core/Src/hal_spi_rf_trxeb.o \
+./Core/Src/i2c.o \
 ./Core/Src/main.o \
 ./Core/Src/spi.o \
 ./Core/Src/stm32f4xx_hal_msp.o \
@@ -35,6 +37,7 @@ C_DEPS += \
 ./Core/Src/cc112x_spi.d \
 ./Core/Src/gpio.d \
 ./Core/Src/hal_spi_rf_trxeb.d \
+./Core/Src/i2c.d \
 ./Core/Src/main.d \
 ./Core/Src/spi.d \
 ./Core/Src/stm32f4xx_hal_msp.d \
@@ -51,7 +54,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/cc1120_intf.cyclo ./Core/Src/cc1120_intf.d ./Core/Src/cc1120_intf.o ./Core/Src/cc1120_intf.su ./Core/Src/cc112x_spi.cyclo ./Core/Src/cc112x_spi.d ./Core/Src/cc112x_spi.o ./Core/Src/cc112x_spi.su ./Core/Src/gpio.cyclo ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/hal_spi_rf_trxeb.cyclo ./Core/Src/hal_spi_rf_trxeb.d ./Core/Src/hal_spi_rf_trxeb.o ./Core/Src/hal_spi_rf_trxeb.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/spi.cyclo ./Core/Src/spi.d ./Core/Src/spi.o ./Core/Src/spi.su ./Core/Src/stm32f4xx_hal_msp.cyclo ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_it.cyclo ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.cyclo ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su
+	-$(RM) ./Core/Src/cc1120_intf.cyclo ./Core/Src/cc1120_intf.d ./Core/Src/cc1120_intf.o ./Core/Src/cc1120_intf.su ./Core/Src/cc112x_spi.cyclo ./Core/Src/cc112x_spi.d ./Core/Src/cc112x_spi.o ./Core/Src/cc112x_spi.su ./Core/Src/gpio.cyclo ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/hal_spi_rf_trxeb.cyclo ./Core/Src/hal_spi_rf_trxeb.d ./Core/Src/hal_spi_rf_trxeb.o ./Core/Src/hal_spi_rf_trxeb.su ./Core/Src/i2c.cyclo ./Core/Src/i2c.d ./Core/Src/i2c.o ./Core/Src/i2c.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/spi.cyclo ./Core/Src/spi.d ./Core/Src/spi.o ./Core/Src/spi.su ./Core/Src/stm32f4xx_hal_msp.cyclo ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_it.cyclo ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.cyclo ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su
 
 .PHONY: clean-Core-2f-Src
 
