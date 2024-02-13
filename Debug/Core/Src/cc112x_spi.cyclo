@@ -1,0 +1,9 @@
+../Core/Src/cc112x_spi.c:50:22:cc1120SpiTRx	1
+../Core/Src/cc112x_spi.c:62:6:cc1120_startTransaction	1
+../Core/Src/cc112x_spi.c:70:6:cc1120_endTransaction	1
+../Core/Src/cc112x_spi.c:92:12:cc112xSpiReadReg	5
+../Core/Src/cc112x_spi.c:131:12:cc112xSpiWriteReg	5
+../Core/Src/cc112x_spi.c:167:12:cc112xSpiWriteTxFifo	1
+../Core/Src/cc112x_spi.c:188:12:cc112xSpiReadRxFifo	1
+../Core/Src/cc112x_spi.c:219:12:cc112xGetTxStatus	1
+../Core/Src/cc112x_spi.c:251:12:cc112xGetRxStatus	1
