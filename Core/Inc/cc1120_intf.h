@@ -10,7 +10,11 @@
 
 
 
-
-void registerConfig(RfConfig config);
+/*!
+* @brief This API confiures the CC1120 radio with the given RF configuration.
+* @param config RFConfig type configuration values
+* 
+*/
+CC1120_StatusTypeDef registerConfig(RfConfig config);
 
 #endif
