@@ -11,6 +11,7 @@
 #define CC1120_TIMOUT_ms 250
 
 #define PKTLEN                  10  // 1 < PKTLEN < 126
+#define RX_FIFO_ERROR       0x11
 
 /* configuration registers */
 #define CC1120_IOCFG3                   0x0000
