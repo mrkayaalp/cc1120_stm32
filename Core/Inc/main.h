@@ -59,6 +59,24 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define SPI1_CS_Pin GPIO_PIN_4
 #define SPI1_CS_GPIO_Port GPIOA
+#define HGM_CC1190_Pin GPIO_PIN_14
+#define HGM_CC1190_GPIO_Port GPIOB
+#define LNA_EN_CC1190_Pin GPIO_PIN_15
+#define LNA_EN_CC1190_GPIO_Port GPIOB
+#define PA_EN_CC11190_Pin GPIO_PIN_6
+#define PA_EN_CC11190_GPIO_Port GPIOC
+#define GPIO3_CC1120_Pin GPIO_PIN_7
+#define GPIO3_CC1120_GPIO_Port GPIOC
+#define GPIO2_CC1120_Pin GPIO_PIN_8
+#define GPIO2_CC1120_GPIO_Port GPIOC
+#define GPIO0_CC1120_Pin GPIO_PIN_9
+#define GPIO0_CC1120_GPIO_Port GPIOC
+#define USERLED2_Pin GPIO_PIN_3
+#define USERLED2_GPIO_Port GPIOB
+#define USERLED_Pin GPIO_PIN_4
+#define USERLED_GPIO_Port GPIOB
+#define BUZZER_Pin GPIO_PIN_5
+#define BUZZER_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
