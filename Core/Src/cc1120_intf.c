@@ -1,5 +1,7 @@
 #include "cc1120_intf.h"
 
+cc1120_devTypeDef cc1120_dev;
+
 uint16_t rxPacketCounter = 0;
 uint16_t txPacketCounter = 0;
 
@@ -11,18 +13,29 @@ static uint8_t rssi2compl,rssiValid;
 static uint8_t rssiOffset = 102;
 static int8_t rssiConverted;
 
-uint8_t sensorData[PKTLEN - 3] = { 0x45, 0x56, 0x67, 0x78, 0x89, 0x9A, 0xAB };
+uint8_t sensorData[PKTLEN - 3] = { 0x45, 0x56, 0x67, 0x78, 0x89, 0x9A, 0xAB }; //Dummy datas we won't use it in real application
 uint8_t rfTxPacket[PKTLEN] = { 0x00 };
+
+
+/***** Static Function Declarations****/
+
+/*!
+* @brief This API creates TX packet with the given sensor data with configured length.
+* @param[in] cc1120_dev Pointer to the device structure.
+* @param[in] sensorData Pointer to the sensor data.
+* @return void
+*/
+static void createRfTxPacket(cc1120_devTypeDef *cc1120_dev, uint8_t sensorData[]);
 
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
 */
-CC1120_StatusTypeDef registerConfig(RfConfig config) {
+CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef *cc1120_dev) {
   uint8 writeByte;
 
   trxSpiCmdStrobe(CC112X_SRES);
 
-  if (config == _4GFSK_200kbps) {
+  if (cc1120_dev->rfconfig == _4GFSK_200kbps) {
     for (uint16 i = 0;
       i < (sizeof(preferredSettingsMaxDR) / sizeof(registerSetting_t)); i++) {
       writeByte = preferredSettingsMaxDR[i].data;
@@ -38,40 +51,49 @@ CC1120_StatusTypeDef registerConfig(RfConfig config) {
   }
 }
 
-CC1120_StatusTypeDef rfinit() {
+CC1120_StatusTypeDef rfinit(cc1120_devTypeDef *cc1120_dev) {
+  //Set configuration settings in device
+  cc1120_dev->intf = CC1120_INTF;
+  cc1120_dev->packetLength = PKTLEN;
+  cc1120_dev->rfconfig = _4GFSK_200kbps;
+  cc1120_dev->rfmode = RF_MODE_TX;
+  cc1120_dev->amp_hgm =  Amp_HGM_ON;
+
   //Configure register settings
-  registerConfig(_4GFSK_200kbps);
+  registerConfig(cc1120_dev);
+
+  if(cc1120_dev->rfmode == RF_MODE_TX){
+    rfSendTxPacket(cc1120_dev, sensorData); //Wait for tx interrupt and send data again
+  }
+  else{
+    rfInitRx(); // Wait for rx interrupt and receive data
+  }
 
 }
 
 /*---------------------TX------------------------------------*/
-void rfSendTxPacket(uint8_t sensorData[]) {
+void rfSendTxPacket(cc1120_devTypeDef *cc1120_dev, uint8_t sensorData[]) {
   // Create packet
-  createRfTxPacket(sensorData);
+  createRfTxPacket(cc1120_dev, sensorData);
 
   // Write packet to TX FIFO
   cc112xSpiWriteTxFifo(rfTxPacket, sizeof(rfTxPacket));
 
 
   // Strobe TX to Send packet
-  trxSpiCmdStrobe(CC112X_STX);
+  trxSpiCmdStrobe(CC112X_STX); 
 }
 
-static void createRfTxPacket(uint8_t sensorData[]) {
+static void createRfTxPacket(cc1120_devTypeDef *cc1120_dev, uint8_t sensorData[]) {
 
-  rfTxPacket[0] = PKTLEN;                           // Length byte
+  rfTxPacket[0] = cc1120_dev->packetLength;                           // Length byte
   rfTxPacket[1] = (uint8_t)(txPacketCounter >> 8);     // MSB of packetCounter
   rfTxPacket[2] = (uint8_t)txPacketCounter;           // LSB of packetCounter
 
   // Fill rest of the buffer with the sensor data
-  rfTxPacket[3] = sensorData[0];
-  rfTxPacket[4] = sensorData[1];
-  rfTxPacket[5] = sensorData[2];
-  rfTxPacket[6] = sensorData[3];
-  rfTxPacket[7] = sensorData[4];
-  rfTxPacket[8] = sensorData[5];
-  rfTxPacket[9] = sensorData[6];
-
+  for(uint8_t i = 3; i < (cc1120_dev->packetLength); i++){
+    rfTxPacket[i] = sensorData[i - 3];
+  }
 }
 /*-------------------------------RX--------------------------*/
 void rfInitRx() {

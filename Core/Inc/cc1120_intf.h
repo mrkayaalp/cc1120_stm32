@@ -12,9 +12,9 @@
 
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
-* @param config RFConfig type configuration values
+* @param cc1120_devTypeDef - CC1120 pointer device structure
 * 
 */
-CC1120_StatusTypeDef registerConfig(RfConfig config);
+CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef *cc1120_dev);
 
 #endif

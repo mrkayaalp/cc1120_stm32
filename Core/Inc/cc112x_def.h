@@ -7,7 +7,7 @@
 #define CC1120_CS_Pin SPI1_CS_Pin
 #define CC1120_CS_GPIO_Port SPI1_CS_GPIO_Port
 
-#define CC1120_INTF &hspi1
+#define CC1120_INTF hspi1
 #define CC1120_TIMOUT_ms 250
 
 #define PKTLEN                  10  // 1 < PKTLEN < 126
@@ -236,22 +236,33 @@
 
 typedef enum
 {
-    CC1120_OK = 0x00U,
-    CC1120_ERROR = 0x01U,
-    CC1120_BUSY = 0x02U,
-    CC1120_TIMEOUT = 0x03U
+  CC1120_OK = 0x00U,
+  CC1120_ERROR = 0x01U,
+  CC1120_BUSY = 0x02U,
+  CC1120_TIMEOUT = 0x03U
 } CC1120_StatusTypeDef;
+
+/*-------Config Parameter enums & structs------*/
 
 // ENUM used the set the mode
 typedef enum {
-	TX = 0x00,
-	RX = 0x01
+  RF_MODE_TX,
+  RF_MODE_RX
 }RfMode;
 
 // ENUM used to set the freqBand in MENU_DATA
 typedef enum {
-	_4GFSK_200kbps
+  _4GFSK_200kbps,
+  _OTHER_MODE
 }RfConfig;
+
+typedef enum {
+  Amp_HGM_OFF,
+  Amp_HGM_ON
+}Amp_HGM;
+
+
+/*-----------------------------------------*/
 
 typedef signed   char   int8;
 typedef unsigned char   uint8;
@@ -292,7 +303,7 @@ typedef void (*VFPTR)(void);
 // TX Power = 27
 // Whitening = false
 
-static const registerSetting_t preferredSettingsMaxDR[]=
+static const registerSetting_t preferredSettingsMaxDR[] =
 {
   {CC1120_IOCFG3,            0xB0},
   {CC1120_IOCFG2,            0x06},
@@ -343,7 +354,7 @@ static const registerSetting_t preferredSettingsMaxDR[]=
 };
 
 
-static const registerSetting_t preferredSettingsSens[]=
+static const registerSetting_t preferredSettingsSens[] =
 {
   {CC1120_IOCFG3,            0xB0},
   {CC1120_IOCFG2,            0x06},
@@ -381,5 +392,23 @@ static const registerSetting_t preferredSettingsSens[]=
   {CC1120_XOSC5,             0x0E},
   {CC1120_XOSC1,             0x03},
 };
+
+typedef struct {
+  //Device Communication Interface 
+  SPI_HandleTypeDef intf;
+  
+  //Device RX/TX Packet Length
+  uint8_t packetLength;
+  
+  //Device RF Mode
+  RfMode rfmode;
+  
+  //Device RF Configuration
+  RfConfig rfconfig;
+  
+  //Device Amplifier Mode
+  Amp_HGM amp_hgm;
+
+}cc1120_devTypeDef;
 
 #endif

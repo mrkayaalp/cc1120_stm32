@@ -97,6 +97,8 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
+
+  
   
 
   /* USER CODE END 2 */
