@@ -79,6 +79,7 @@ CC1120_StatusTypeDef rfinit(cc1120_devTypeDef* cc1120_dev) {
   cc1120_dev->rfmode = RF_MODE_TX;
   cc1120_dev->amp_mode = AMP_HGM_ON;
 
+  //Set GPIOs for amplifier
   configAmplifier(cc1120_dev);
 
   //Configure register settings
@@ -94,6 +95,7 @@ CC1120_StatusTypeDef rfinit(cc1120_devTypeDef* cc1120_dev) {
 }
 
 /*---------------------TX------------------------------------*/
+
 void rfSendTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]) {
   // Create packet
   createRfTxPacket(cc1120_dev, sensorData);
@@ -117,12 +119,17 @@ static void createRfTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]
     rfTxPacket[i] = sensorData[i - 3];
   }
 }
+
 /*-------------------------------RX--------------------------*/
-void rfInitRx() {
+
+/*!
+* @brief This API sets the CC1120 radio for RX mode.
+*/
+void rfRunRx() {
   // Strobe RX to receive packet
   trxSpiCmdStrobe(CC112X_SRX);
-
 }
+
 
 void rfRecieveRxPacket() {
   cc112xSpiReadReg(CC112X_NUM_RXBYTES, &rxBytes, 1);

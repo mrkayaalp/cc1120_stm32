@@ -6,10 +6,6 @@
 
 
 
-
-
-
-
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
 * @param cc1120_devTypeDef - CC1120 pointer device structure
@@ -21,6 +17,12 @@ CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef *cc1120_dev);
 * @param[in] cc1120_dev Pointer to the device structure.
 * @return void
 */
-void configAmplifier(cc1120_devTypeDef* cc1120_dev)
+void configAmplifier(cc1120_devTypeDef* cc1120_dev);
+
+/*!
+* @brief This API sets the CC1120 radio for RX mode.
+* @return void
+*/
+void rfRunRx();
 
 #endif
