@@ -4,8 +4,18 @@
 
 
 
+/*--------------------Pin Defines*-----------------*/
 #define CC1120_CS_Pin SPI1_CS_Pin
 #define CC1120_CS_GPIO_Port SPI1_CS_GPIO_Port
+
+#define AMP_HGM_PIN HGM_CC1190_Pin 
+#define AMP_HGM_PORT HGM_CC1190_GPIO_Port
+
+#define AMP_LNA_PIN LNA_EN_CC1190_Pin 
+#define AMP_LNA_PORT LNA_EN_CC1190_GPIO_Port
+
+#define AMP_PA_PIN PA_EN_CC11190_Pin 
+#define AMP_PA_PORT PA_EN_CC11190_GPIO_Port  
 
 #define CC1120_INTF hspi1
 #define CC1120_TIMOUT_ms 250
@@ -257,9 +267,10 @@ typedef enum {
 }RfConfig;
 
 typedef enum {
-  Amp_HGM_OFF,
-  Amp_HGM_ON
-}Amp_HGM;
+  AMP_HGM_OFF,
+  AMP_HGM_ON,
+  AMP_POWER_DOWN
+}Amp_Mode;
 
 
 /*-----------------------------------------*/
@@ -407,7 +418,7 @@ typedef struct {
   RfConfig rfconfig;
   
   //Device Amplifier Mode
-  Amp_HGM amp_hgm;
+  Amp_Mode amp_mode;
 
 }cc1120_devTypeDef;
 

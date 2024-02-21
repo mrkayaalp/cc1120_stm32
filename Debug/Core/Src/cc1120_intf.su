@@ -1,7 +1,10 @@
-../Core/Src/cc1120_intf.c:25:22:registerConfig	24	static
-../Core/Src/cc1120_intf.c:46:22:rfinit	8	static
-../Core/Src/cc1120_intf.c:53:6:rfSendTxPacket	16	static
-../Core/Src/cc1120_intf.c:65:13:createRfTxPacket	16	static
-../Core/Src/cc1120_intf.c:82:6:rfInitRx	8	static
-../Core/Src/cc1120_intf.c:88:6:rfRecieveRxPacket	8	static
-../Core/Src/cc1120_intf.c:132:13:updateRssi	8	static
+../Core/Src/cc1120_intf.c:53:22:registerConfig	24	static
+../Core/Src/cc1120_intf.c:74:22:rfinit	16	static
+../Core/Src/cc1120_intf.c:97:6:rfSendTxPacket	16	static
+../Core/Src/cc1120_intf.c:109:13:createRfTxPacket	24	static
+../Core/Src/cc1120_intf.c:121:6:rfInitRx	8	static
+../Core/Src/cc1120_intf.c:127:6:rfRecieveRxPacket	8	static
+../Core/Src/cc1120_intf.c:171:6:configAmplifier	16	static
+../Core/Src/cc1120_intf.c:181:13:setAmpMode	16	static
+../Core/Src/cc1120_intf.c:195:13:setAmpDirection	16	static
+../Core/Src/cc1120_intf.c:220:13:updateRssi	8	static

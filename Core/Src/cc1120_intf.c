@@ -5,11 +5,11 @@ cc1120_devTypeDef cc1120_dev;
 uint16_t rxPacketCounter = 0;
 uint16_t txPacketCounter = 0;
 
-uint8_t rxBuffer[128] = {0};
+uint8_t rxBuffer[128] = { 0 };
 uint8_t rxBytes;
 uint8_t marcState;
 
-static uint8_t rssi2compl,rssiValid;
+static uint8_t rssi2compl, rssiValid;
 static uint8_t rssiOffset = 102;
 static int8_t rssiConverted;
 
@@ -17,7 +17,7 @@ uint8_t sensorData[PKTLEN - 3] = { 0x45, 0x56, 0x67, 0x78, 0x89, 0x9A, 0xAB }; /
 uint8_t rfTxPacket[PKTLEN] = { 0x00 };
 
 
-/***** Static Function Declarations****/
+/*---------------Static Function Declarations------------------*/
 
 /*!
 * @brief This API creates TX packet with the given sensor data with configured length.
@@ -25,12 +25,32 @@ uint8_t rfTxPacket[PKTLEN] = { 0x00 };
 * @param[in] sensorData Pointer to the sensor data.
 * @return void
 */
-static void createRfTxPacket(cc1120_devTypeDef *cc1120_dev, uint8_t sensorData[]);
+static void createRfTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]);
+
+/*!
+* @brief This API sets the mode of the amplifier.
+* @param[in] cc1120_dev Pointer to the device structure.
+* @return void
+*/
+static void setAmpMode(cc1120_devTypeDef* cc1120_dev);
+
+/*!
+* @brief This API sets the direction of the amplifier RX/TX.
+* @param[in] cc1120_dev Pointer to the device structure.
+* @return void
+*/
+static void setAmpDirection(cc1120_devTypeDef* cc1120_dev);
+
+
+/*---------------------Public Functions------------------------*/
+
+
+
 
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
 */
-CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef *cc1120_dev) {
+CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef* cc1120_dev) {
   uint8 writeByte;
 
   trxSpiCmdStrobe(CC112X_SRES);
@@ -51,28 +71,30 @@ CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef *cc1120_dev) {
   }
 }
 
-CC1120_StatusTypeDef rfinit(cc1120_devTypeDef *cc1120_dev) {
+CC1120_StatusTypeDef rfinit(cc1120_devTypeDef* cc1120_dev) {
   //Set configuration settings in device
   cc1120_dev->intf = CC1120_INTF;
   cc1120_dev->packetLength = PKTLEN;
   cc1120_dev->rfconfig = _4GFSK_200kbps;
   cc1120_dev->rfmode = RF_MODE_TX;
-  cc1120_dev->amp_hgm =  Amp_HGM_ON;
+  cc1120_dev->amp_mode = AMP_HGM_ON;
+
+  configAmplifier(cc1120_dev);
 
   //Configure register settings
   registerConfig(cc1120_dev);
 
-  if(cc1120_dev->rfmode == RF_MODE_TX){
+  if (cc1120_dev->rfmode == RF_MODE_TX) {
     rfSendTxPacket(cc1120_dev, sensorData); //Wait for tx interrupt and send data again
   }
-  else{
+  else {
     rfInitRx(); // Wait for rx interrupt and receive data
   }
 
 }
 
 /*---------------------TX------------------------------------*/
-void rfSendTxPacket(cc1120_devTypeDef *cc1120_dev, uint8_t sensorData[]) {
+void rfSendTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]) {
   // Create packet
   createRfTxPacket(cc1120_dev, sensorData);
 
@@ -81,17 +103,17 @@ void rfSendTxPacket(cc1120_devTypeDef *cc1120_dev, uint8_t sensorData[]) {
 
 
   // Strobe TX to Send packet
-  trxSpiCmdStrobe(CC112X_STX); 
+  trxSpiCmdStrobe(CC112X_STX);
 }
 
-static void createRfTxPacket(cc1120_devTypeDef *cc1120_dev, uint8_t sensorData[]) {
+static void createRfTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]) {
 
   rfTxPacket[0] = cc1120_dev->packetLength;                           // Length byte
   rfTxPacket[1] = (uint8_t)(txPacketCounter >> 8);     // MSB of packetCounter
   rfTxPacket[2] = (uint8_t)txPacketCounter;           // LSB of packetCounter
 
   // Fill rest of the buffer with the sensor data
-  for(uint8_t i = 3; i < (cc1120_dev->packetLength); i++){
+  for (uint8_t i = 3; i < (cc1120_dev->packetLength); i++) {
     rfTxPacket[i] = sensorData[i - 3];
   }
 }
@@ -135,11 +157,64 @@ void rfRecieveRxPacket() {
   }
 }
 
+
+/*----------------------Amplifier Functions------------------------------*/
+
+// Table for PA_EN, LNA_EN, HGM, and Mode of Operation
+// PA_EN | LNA_EN | HGM | Mode of Operation
+//   0   |   0    |  X  |    Power Down
+//   0   |   1    |  0  |    RX LGM
+//   0   |   1    |  1  |    RX HGM
+//   1   |   0    |  0  |    TX LGM
+//   1   |   0    |  1  |    TX HGM
+
+
+
+/*!
+* @brief This API configures the  CC1190 amplifier.
+*/
+void configAmplifier(cc1120_devTypeDef* cc1120_dev) {
+  setAmpMode(cc1120_dev);
+  setAmpDirection(cc1120_dev);
+
+}
+
+/*!
+* @brief This API sets the mode of the amplifier.
+*/
+static void setAmpMode(cc1120_devTypeDef* cc1120_dev) {
+  if (cc1120_dev->amp_mode == AMP_POWER_DOWN) {
+    HAL_GPIO_WritePin(AMP_PA_PORT, AMP_PA_PIN, 0);
+    HAL_GPIO_WritePin(AMP_LNA_PORT, AMP_LNA_PIN, 0);
+
+  }
+  else {
+    HAL_GPIO_WritePin(AMP_HGM_PORT, AMP_HGM_PORT, cc1120_dev->amp_mode);
+  }
+}
+
+/*!
+* @brief This API sets the direction of the amplifier RX/TX.
+*/
+static void setAmpDirection(cc1120_devTypeDef* cc1120_dev) {
+  if (cc1120_dev->rfmode == RF_MODE_TX) {
+    HAL_GPIO_WritePin(AMP_PA_PORT, AMP_PA_PIN, 1);
+    HAL_GPIO_WritePin(AMP_LNA_PORT, AMP_LNA_PIN, 0);
+  }
+  else {
+    HAL_GPIO_WritePin(AMP_PA_PORT, AMP_PA_PIN, 0);
+    HAL_GPIO_WritePin(AMP_LNA_PORT, AMP_LNA_PIN, 1);
+  }
+}
+
+
+/*---------------------RSSI------------------------------------*/
+
 /*******************************************************************************
 *   @fn         updateRssi
 *
-*   @brief      Reads the RSSI register if RSSI_VALID is asserted and do 
-*               necessary conversions. Calculates the average RSSI based on the 
+*   @brief      Reads the RSSI register if RSSI_VALID is asserted and do
+*               necessary conversions. Calculates the average RSSI based on the
 *               last 10 packets
 *
 *   @param      none
@@ -151,7 +226,7 @@ static void updateRssi(void) {
 
   cc112xSpiReadReg(CC1120_RSSI0, &rssiValid, 1); // Is rssi calculation valid?
 
-  if(rssiValid & 0x01) {
+  if (rssiValid & 0x01) {
     cc112xSpiReadReg(CC1120_RSSI1, &rssi2compl, 1);
     rssiConverted = (int8_t)rssi2compl - rssiOffset;
   }

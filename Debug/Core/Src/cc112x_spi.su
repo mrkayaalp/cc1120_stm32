@@ -1,4 +1,4 @@
-../Core/Src/cc112x_spi.c:50:22:cc1120SpiTRx	32	static
+../Core/Src/cc112x_spi.c:50:22:cc1120SpiTRx	120	static
 ../Core/Src/cc112x_spi.c:62:6:cc1120_startTransaction	8	static
 ../Core/Src/cc112x_spi.c:70:6:cc1120_endTransaction	8	static
 ../Core/Src/cc112x_spi.c:92:12:cc112xSpiReadReg	32	static

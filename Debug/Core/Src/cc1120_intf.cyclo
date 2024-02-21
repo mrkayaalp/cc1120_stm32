@@ -1,7 +1,10 @@
-../Core/Src/cc1120_intf.c:25:22:registerConfig	4
-../Core/Src/cc1120_intf.c:46:22:rfinit	1
-../Core/Src/cc1120_intf.c:53:6:rfSendTxPacket	1
-../Core/Src/cc1120_intf.c:65:13:createRfTxPacket	1
-../Core/Src/cc1120_intf.c:82:6:rfInitRx	1
-../Core/Src/cc1120_intf.c:88:6:rfRecieveRxPacket	4
-../Core/Src/cc1120_intf.c:132:13:updateRssi	2
+../Core/Src/cc1120_intf.c:53:22:registerConfig	4
+../Core/Src/cc1120_intf.c:74:22:rfinit	2
+../Core/Src/cc1120_intf.c:97:6:rfSendTxPacket	1
+../Core/Src/cc1120_intf.c:109:13:createRfTxPacket	2
+../Core/Src/cc1120_intf.c:121:6:rfInitRx	1
+../Core/Src/cc1120_intf.c:127:6:rfRecieveRxPacket	4
+../Core/Src/cc1120_intf.c:171:6:configAmplifier	1
+../Core/Src/cc1120_intf.c:181:13:setAmpMode	2
+../Core/Src/cc1120_intf.c:195:13:setAmpDirection	2
+../Core/Src/cc1120_intf.c:220:13:updateRssi	2
