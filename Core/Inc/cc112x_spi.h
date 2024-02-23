@@ -64,16 +64,22 @@ extern "C" {
 /******************************************************************************
  * PROTPTYPES
  */ 
-CC1120_StatusTypeDef cc1120SpiTRx(uint8_t *txbuffer, uint8_t *rxbuffer);
+/*!
+* @brief spi communication func. for CC1120
+* @param[in] txbuffer - pointer to the tx buffer
+* @param[in] rxbuffer - pointer to the rx buffer
+* @return RfSerialStatus_t
+*/
+RfSerialStatus_t cc1120SpiTRx(uint8_t *txbuffer, uint8_t *rxbuffer);
 void  cc1120_startTransaction();
 void cc1120_endTransaction();
 /* basic set of access functions */
-rfStatus_t cc112xSpiReadReg(uint16 addr, uint8 *data, uint8 len);
-rfStatus_t cc112xGetTxStatus(void);
-rfStatus_t cc112xGetRxStatus(void);  
-rfStatus_t cc112xSpiWriteReg(uint16 addr, uint8 *data, uint8 len);
-rfStatus_t cc112xSpiWriteTxFifo(uint8 *pWriteData, uint8 len);
-rfStatus_t cc112xSpiReadRxFifo(uint8 *pReadData, uint8 len);
+RfChipStatus_t cc112xSpiReadReg(uint16 addr, uint8 *data, uint8 len);
+RfChipStatus_t cc112xGetTxStatus(void);
+RfChipStatus_t cc112xGetRxStatus(void);  
+RfChipStatus_t cc112xSpiWriteReg(uint16 addr, uint8 *data, uint8 len);
+RfChipStatus_t cc112xSpiWriteTxFifo(uint8 *pWriteData, uint8 len);
+RfChipStatus_t cc112xSpiReadRxFifo(uint8 *pReadData, uint8 len);
 
 #ifdef  __cplusplus
 }

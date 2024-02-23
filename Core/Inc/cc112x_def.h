@@ -246,11 +246,11 @@
 
 typedef enum
 {
-  CC1120_OK = 0x00U,
-  CC1120_ERROR = 0x01U,
-  CC1120_BUSY = 0x02U,
-  CC1120_TIMEOUT = 0x03U
-} CC1120_StatusTypeDef;
+  RF_SERIAL_OK = 0x00U,
+  RF_SERIAL_ERROR = 0x01U,
+  RF_SERIAL_BUSY = 0x02U,
+  RF_SERIAL_TIMEOUT = 0x03U
+} RfSerialStatus_t;
 
 /*-------Config Parameter enums & structs------*/
 
@@ -272,6 +272,16 @@ typedef enum {
   AMP_POWER_DOWN
 }Amp_Mode;
 
+typedef enum {
+  RF_IDLE,
+  RF_RX,
+  RF_TX,
+  RF_FSTXON,
+  RF_CALIBRATE,
+  RF_SETTLING,
+  RF_RXFIFO_ERROR,
+  RF_TXFIFO_ERROR
+}RfChipStatus_t;
 
 /*-----------------------------------------*/
 
@@ -407,16 +417,16 @@ static const registerSetting_t preferredSettingsSens[] =
 typedef struct {
   //Device Communication Interface 
   SPI_HandleTypeDef intf;
-  
+
   //Device RX/TX Packet Length
   uint8_t packetLength;
-  
+
   //Device RF Mode
   RfMode rfmode;
-  
+
   //Device RF Configuration
   RfConfig rfconfig;
-  
+
   //Device Amplifier Mode
   Amp_Mode amp_mode;
 

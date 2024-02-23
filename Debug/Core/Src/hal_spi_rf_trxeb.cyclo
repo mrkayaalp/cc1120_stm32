@@ -1,4 +1,4 @@
-../Core/Src/hal_spi_rf_trxeb.c:79:12:trx8BitRegAccess	2
-../Core/Src/hal_spi_rf_trxeb.c:129:12:trx16BitRegAccess	3
-../Core/Src/hal_spi_rf_trxeb.c:173:12:trxSpiCmdStrobe	3
-../Core/Src/hal_spi_rf_trxeb.c:222:13:trxReadWriteBurstSingle	10
+../Core/Src/hal_spi_rf_trxeb.c:79:16:trx8BitRegAccess	2
+../Core/Src/hal_spi_rf_trxeb.c:130:16:trx16BitRegAccess	3
+../Core/Src/hal_spi_rf_trxeb.c:175:16:trxSpiCmdStrobe	3
+../Core/Src/hal_spi_rf_trxeb.c:225:25:trxReadWriteBurstSingle	10

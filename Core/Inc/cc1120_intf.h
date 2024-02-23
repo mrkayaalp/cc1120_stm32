@@ -8,9 +8,37 @@
 
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
-* @param cc1120_devTypeDef - CC1120 pointer device structure
+* @param[in] cc1120_devTypeDef - CC1120 pointer device structure
+* @return RfChipStatus_t
 */
-CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef *cc1120_dev);
+RfChipStatus_t registerConfig(cc1120_devTypeDef* cc1120_dev);
+
+/*!
+* @brief This API initialize the CC1120 radio with the given RF configuration.
+* @param[in] cc1120_devTypeDef - CC1120 pointer device structure
+* @return RfChipStatus_t
+*/
+RfChipStatus_t rfinit(cc1120_devTypeDef* cc1120_dev);
+
+/*!
+* @brief This API sends the given sensor data to the CC1120 radio.
+* @param[in] cc1120_devTypeDef - CC1120 pointer device structure
+* @param[in] sensorData - Sensor data
+* @return RfChipStatus_t
+*/
+RfChipStatus_t rfSendTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]);
+
+/*!
+* @brief This API sets the CC1120 radio for RX mode.
+* @return RfChipStatus_t
+*/
+RfChipStatus_t rfRunRx();
+
+/*!
+* @brief This API recieve the  RX buffer.
+* @return RfChipStatus_t
+*/
+RfChipStatus_t rfRecieveRxPacket();
 
 /*!
 * @brief This API configures the  CC1190 amplifier.
@@ -19,10 +47,5 @@ CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef *cc1120_dev);
 */
 void configAmplifier(cc1120_devTypeDef* cc1120_dev);
 
-/*!
-* @brief This API sets the CC1120 radio for RX mode.
-* @return void
-*/
-void rfRunRx();
 
 #endif

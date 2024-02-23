@@ -50,28 +50,33 @@ static void setAmpDirection(cc1120_devTypeDef* cc1120_dev);
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
 */
-CC1120_StatusTypeDef registerConfig(cc1120_devTypeDef* cc1120_dev) {
+RfChipStatus_t registerConfig(cc1120_devTypeDef* cc1120_dev) {
   uint8 writeByte;
+  RfChipStatus_t chipstatus;
 
-  trxSpiCmdStrobe(CC112X_SRES);
+  chipstatus = trxSpiCmdStrobe(CC112X_SRES);
 
   if (cc1120_dev->rfconfig == _4GFSK_200kbps) {
     for (uint16 i = 0;
       i < (sizeof(preferredSettingsMaxDR) / sizeof(registerSetting_t)); i++) {
       writeByte = preferredSettingsMaxDR[i].data;
-      cc112xSpiWriteReg(preferredSettingsMaxDR[i].addr, &writeByte, 1);
+      chipstatus = cc112xSpiWriteReg(preferredSettingsMaxDR[i].addr, &writeByte, 1);
     }
   }
   else {
     for (uint16 i = 0;
       i < (sizeof(preferredSettingsSens) / sizeof(registerSetting_t)); i++) {
       writeByte = preferredSettingsSens[i].data;
-      cc112xSpiWriteReg(preferredSettingsSens[i].addr, &writeByte, 1);
+      chipstatus = cc112xSpiWriteReg(preferredSettingsSens[i].addr, &writeByte, 1);
     }
   }
+  return chipstatus;
 }
-
-CC1120_StatusTypeDef rfinit(cc1120_devTypeDef* cc1120_dev) {
+/*!
+* @brief This API initialize the CC1120 radio with the given RF configuration.
+*/
+RfChipStatus_t rfinit(cc1120_devTypeDef* cc1120_dev) {
+  RfChipStatus_t chipstatus;
   //Set configuration settings in device
   cc1120_dev->intf = CC1120_INTF;
   cc1120_dev->packetLength = PKTLEN;
@@ -83,29 +88,34 @@ CC1120_StatusTypeDef rfinit(cc1120_devTypeDef* cc1120_dev) {
   configAmplifier(cc1120_dev);
 
   //Configure register settings
-  registerConfig(cc1120_dev);
+  chipstatus = registerConfig(cc1120_dev);
 
   if (cc1120_dev->rfmode == RF_MODE_TX) {
-    rfSendTxPacket(cc1120_dev, sensorData); //Wait for tx interrupt and send data again
+    chipstatus = rfSendTxPacket(cc1120_dev, sensorData); //Wait for tx interrupt and send data again
   }
   else {
-    rfInitRx(); // Wait for rx interrupt and receive data
+    chipstatus = rfInitRx(); // Wait for rx interrupt and receive data
   }
-
+  return chipstatus;
 }
 
 /*---------------------TX------------------------------------*/
 
-void rfSendTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]) {
+/*!
+* @brief This API sends the given sensor data to the CC1120 radio.
+*/
+RfChipStatus_t rfSendTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]) {
+  RfChipStatus_t chipstatus;
   // Create packet
   createRfTxPacket(cc1120_dev, sensorData);
 
   // Write packet to TX FIFO
-  cc112xSpiWriteTxFifo(rfTxPacket, sizeof(rfTxPacket));
+  chipstatus = cc112xSpiWriteTxFifo(rfTxPacket, sizeof(rfTxPacket));
 
 
   // Strobe TX to Send packet
-  trxSpiCmdStrobe(CC112X_STX);
+  chipstatus = trxSpiCmdStrobe(CC112X_STX);
+  return chipstatus;
 }
 
 static void createRfTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]) {
@@ -125,31 +135,35 @@ static void createRfTxPacket(cc1120_devTypeDef* cc1120_dev, uint8_t sensorData[]
 /*!
 * @brief This API sets the CC1120 radio for RX mode.
 */
-void rfRunRx() {
+RfChipStatus_t rfRunRx() {
+  RfChipStatus_t chipstatus;
   // Strobe RX to receive packet
-  trxSpiCmdStrobe(CC112X_SRX);
+  chipstatus = trxSpiCmdStrobe(CC112X_SRX);
 }
 
-
-void rfRecieveRxPacket() {
-  cc112xSpiReadReg(CC112X_NUM_RXBYTES, &rxBytes, 1);
+/*!
+* @brief This API recieve the  RX buffer.
+*/
+RfChipStatus_t rfRecieveRxPacket() {
+  RfChipStatus_t chipstatus;
+  chipstatus = cc112xSpiReadReg(CC112X_NUM_RXBYTES, &rxBytes, 1);
 
   // Check that we have bytes in FIFO
   if (rxBytes != 0) {
 
     // Read MARCSTATE to check for RX FIFO error
-    cc112xSpiReadReg(CC1120_MARCSTATE, &marcState, 1);
+    chipstatus = cc112xSpiReadReg(CC1120_MARCSTATE, &marcState, 1);
 
     // Mask out MARCSTATE bits and check if we have a RX FIFO error
     if ((marcState & 0x1F) == RX_FIFO_ERROR) {
 
       // Flush RX FIFO
-      trxSpiCmdStrobe(CC112X_SFRX);
+      chipstatus = trxSpiCmdStrobe(CC112X_SFRX);
     }
     else {
 
       // Read n bytes from RX FIFO
-      cc112xSpiReadRxFifo(rxBuffer, rxBytes);
+      chipstatus = cc112xSpiReadRxFifo(rxBuffer, rxBytes);
 
       // Check CRC ok (CRC_OK: bit7 in second status byte)
       // This assumes status bytes are appended in RX_FIFO
@@ -162,6 +176,7 @@ void rfRecieveRxPacket() {
       }
     }
   }
+  return chipstatus;
 }
 
 

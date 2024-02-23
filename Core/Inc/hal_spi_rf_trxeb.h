@@ -87,11 +87,11 @@ extern "C" {
  */
 
 void trxRfSpiInterfaceInit(uint8 clockDivider);
-rfStatus_t trx8BitRegAccess(uint8 accessType, uint8 addrByte, uint8 *pData, uint16 len);
-rfStatus_t trxSpiCmdStrobe(uint8 cmd);
+RfChipStatus_t trx8BitRegAccess(uint8 accessType, uint8 addrByte, uint8 *pData, uint16 len);
+RfChipStatus_t trxSpiCmdStrobe(uint8 cmd);
 
 /* CC112X specific prototype function */
-rfStatus_t trx16BitRegAccess(uint8 accessType, uint8 extAddr, uint8 regAddr, uint8 *pData, uint8 len);
+RfChipStatus_t trx16BitRegAccess(uint8 accessType, uint8 extAddr, uint8 regAddr, uint8 *pData, uint8 len);
 
 #ifdef  __cplusplus
 }

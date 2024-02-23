@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename: hal_spi_rf_trxeb.c
 *
-*  Description: Implementation file for common spi access with the CCxxxx 
+*  Description: Implementation file for common spi access with the CCxxxx
 *               tranceiver radios using trxeb. Supports CC1101/CC112X radios
 *
 *  Copyright (C) 2013 Texas Instruments Incorporated - http://www.ti.com/
@@ -44,10 +44,10 @@
 #include "cc112x_def.h"
 
 
-/******************************************************************************
- * LOCAL FUNCTIONS
- */
-static void trxReadWriteBurstSingle(uint8 addr,uint8 *pData,uint16 len) ;
+ /******************************************************************************
+  * LOCAL FUNCTIONS
+  */
+static RfSerialStatus_t trxReadWriteBurstSingle(uint8 addr, uint8* pData, uint16 len);
 
 
 /******************************************************************************
@@ -55,51 +55,52 @@ static void trxReadWriteBurstSingle(uint8 addr,uint8 *pData,uint16 len) ;
  */
 
 
-/*******************************************************************************
- * @fn          trx8BitRegAccess
- *
- * @brief       This function performs a read or write from/to a 8bit register
- *              address space. The function handles burst and single read/write
- *              as specfied in addrByte. Function assumes that chip is ready.
- *
- * input parameters
- *
- * @param       accessType - Specifies if this is a read or write and if it's
- *                           a single or burst access. Bitmask made up of
- *                           RADIO_BURST_ACCESS/RADIO_SINGLE_ACCESS/
- *                           RADIO_WRITE_ACCESS/RADIO_READ_ACCESS.
- * @param       addrByte - address byte of register.
- * @param       pData    - data array
- * @param       len      - Length of array to be read(TX)/written(RX)
- *
- * output parameters
- *
- * @return      chip status
- */
-rfStatus_t trx8BitRegAccess(uint8 accessType, uint8 addrByte, uint8 *pData, uint16 len)
+ /*******************************************************************************
+  * @fn          trx8BitRegAccess
+  *
+  * @brief       This function performs a read or write from/to a 8bit register
+  *              address space. The function handles burst and single read/write
+  *              as specfied in addrByte. Function assumes that chip is ready.
+  *
+  * input parameters
+  *
+  * @param       accessType - Specifies if this is a read or write and if it's
+  *                           a single or burst access. Bitmask made up of
+  *                           RADIO_BURST_ACCESS/RADIO_SINGLE_ACCESS/
+  *                           RADIO_WRITE_ACCESS/RADIO_READ_ACCESS.
+  * @param       addrByte - address byte of register.
+  * @param       pData    - data array
+  * @param       len      - Length of array to be read(TX)/written(RX)
+  *
+  * output parameters
+  *
+  * @return      chip status
+  */
+RfChipStatus_t trx8BitRegAccess(uint8 accessType, uint8 addrByte, uint8* pData, uint16 len)
 {
-  uint8_t chipstatus;
-  uint8_t txbuffer = accessType|addrByte;
+  RfChipStatus_t chipstatus;
+  RfSerialStatus_t serailstatus;
+  uint8_t txbuffer = accessType | addrByte;
 
   /* Pull CS_N low and wait for SO to go low before communication starts */
 
-  cc1120_startTransaction(); 
+  cc1120_startTransaction();
 
   /*TRXEM_SPI_BEGIN();
   while(TRXEM_PORT_IN & TRXEM_SPI_MISO_PIN); // TO:DO SO pinin low olduğunu nasıl anlayabilirim
   */
-  
+
   /* send register address byte */
   /*TRXEM_SPI_TX(accessType|addrByte);
   TRXEM_SPI_WAIT_DONE();
   */
 
-  
-  cc1120SpiTRx(&txbuffer, &chipstatus); //rx will be chip status
+
+  serailstatus = cc1120SpiTRx(&txbuffer, &chipstatus); //rx will be chip status
   while (hspi1.State != HAL_SPI_STATE_READY);
 
   /* Storing chip status */
-  trxReadWriteBurstSingle(accessType|addrByte,pData,len);
+  serailstatus = trxReadWriteBurstSingle(accessType | addrByte, pData, len);
   cc1120_endTransaction();
   /* return the status byte value */
   return(chipstatus);
@@ -124,31 +125,32 @@ rfStatus_t trx8BitRegAccess(uint8 accessType, uint8 addrByte, uint8 *pData, uint
  *
  * output parameters
  *
- * @return      rfStatus_t
+ * @return      RfChipStatus_t
  */
-rfStatus_t trx16BitRegAccess(uint8 accessType, uint8 extAddr, uint8 regAddr, uint8 *pData, uint8 len)
+RfChipStatus_t trx16BitRegAccess(uint8 accessType, uint8 extAddr, uint8 regAddr, uint8* pData, uint8 len)
 {
-  uint8_t chipstatus;
+  RfChipStatus_t chipstatus;
+  RfSerialStatus_t serailstatus;
   uint8_t rxbuffer;
-  uint8_t txbuffer = accessType|extAddr;
+  uint8_t txbuffer = accessType | extAddr;
 
   cc1120_startTransaction();
   //TRXEM_SPI_BEGIN();
   //while(TRXEM_PORT_IN & TRXEM_SPI_MISO_PIN);
-  
+
   /* send extended address byte with access type bits set */
-  cc1120SpiTRx(&txbuffer, &chipstatus); //rxbuffer will be chip status
+  serailstatus = cc1120SpiTRx(&txbuffer, &chipstatus); //rxbuffer will be chip status
   // extended command
   while (hspi1.State != HAL_SPI_STATE_READY);
   /* Storing chip status */
   //readValue = TRXEM_SPI_RX();
   //TRXEM_SPI_TX(regAddr);
   //TRXEM_SPI_WAIT_DONE();
-  cc1120SpiTRx(&regAddr, &rxbuffer);
+  serailstatus = cc1120SpiTRx(&regAddr, &rxbuffer);
   while (hspi1.State != HAL_SPI_STATE_READY);
-  
+
   /* Communicate len number of bytes */
-  trxReadWriteBurstSingle(accessType|extAddr,pData,len);
+  serailstatus = trxReadWriteBurstSingle(accessType | extAddr, pData, len);
   //TRXEM_SPI_END();
   cc1120_endTransaction();
   /* return the status byte value */
@@ -170,24 +172,25 @@ rfStatus_t trx16BitRegAccess(uint8 accessType, uint8 extAddr, uint8 regAddr, uin
  *
  * @return      status byte
  */
-rfStatus_t trxSpiCmdStrobe(uint8 cmd)
+RfChipStatus_t trxSpiCmdStrobe(uint8 cmd)
 {
-    uint8 chipstatus;
-    uint8_t txbuffer = cmd;
-    
-    cc1120_startTransaction();
-    while(hspi1.State != HAL_SPI_STATE_READY);
-    //TRXEM_SPI_BEGIN();
-    //while(TRXEM_PORT_IN & TRXEM_SPI_MISO_PIN);
-    cc1120SpiTRx(&txbuffer, &chipstatus);
-    while(hspi1.State != HAL_SPI_STATE_READY);
-    //TRXEM_SPI_TX(cmd);
-    //TRXEM_SPI_WAIT_DONE();
-    //rc = TRXEM_SPI_RX();
-    //TRXEM_SPI_END();
-    cc1120_endTransaction();
+  RfChipStatus_t chipstatus;
+  RfSerialStatus_t serailstatus;
+  uint8_t txbuffer = cmd;
 
-    return(chipstatus);
+  cc1120_startTransaction();
+  while (hspi1.State != HAL_SPI_STATE_READY);
+  //TRXEM_SPI_BEGIN();
+  //while(TRXEM_PORT_IN & TRXEM_SPI_MISO_PIN);
+  serailstatus = cc1120SpiTRx(&txbuffer, &chipstatus);
+  while (hspi1.State != HAL_SPI_STATE_READY);
+  //TRXEM_SPI_TX(cmd);
+  //TRXEM_SPI_WAIT_DONE();
+  //rc = TRXEM_SPI_RX();
+  //TRXEM_SPI_END();
+  cc1120_endTransaction();
+
+  return(chipstatus);
 }
 
 /*******************************************************************************
@@ -217,53 +220,53 @@ rfStatus_t trxSpiCmdStrobe(uint8 cmd)
  *
  * output parameters
  *
- * @return      void
+ * @return      RfSerialStatus_t
  */
-static void trxReadWriteBurstSingle(uint8 addr,uint8 *pData,uint16 len)
+static RfSerialStatus_t trxReadWriteBurstSingle(uint8 addr, uint8* pData, uint16 len)
 {
   uint16 i;
   uint8_t buffer = 0;
-  
 
-  CC1120_StatusTypeDef status;
-	/* Communicate len number of bytes: if RX - the procedure sends 0x00 to push bytes from slave*/
-  if(addr&RADIO_READ_ACCESS)
+
+  RfSerialStatus_t serailstatus;
+  /* Communicate len number of bytes: if RX - the procedure sends 0x00 to push bytes from slave*/
+  if (addr & RADIO_READ_ACCESS)
   {
-    if(addr&RADIO_BURST_ACCESS)
+    if (addr & RADIO_BURST_ACCESS)
     {
       for (i = 0; i < len; i++)
       {
-          //TRXEM_SPI_TX(0);            /* Possible to combining read and write as one access type */
-          //TRXEM_SPI_WAIT_DONE();
-          //*pData = TRXEM_SPI_RX();     /* Store pData from last pData RX */
-          status = cc1120SpiTRx(buffer, pData);
-          while (hspi1.State != HAL_SPI_STATE_READY);
-          pData++;
-      }
-    }
-    else
-    {
-      status = cc1120SpiTRx(buffer, pData);
-      while (hspi1.State != HAL_SPI_STATE_READY);  
-    }
-  }
-  else
-  {
-    if(addr&RADIO_BURST_ACCESS)
-    {
-      /* Communicate len number of bytes: if TX - the procedure doesn't overwrite pData */
-      for (i = 0; i < len; i++)
-      {
-        cc1120SpiTRx(pData, buffer);
+        //TRXEM_SPI_TX(0);            /* Possible to combining read and write as one access type */
+        //TRXEM_SPI_WAIT_DONE();
+        //*pData = TRXEM_SPI_RX();     /* Store pData from last pData RX */
+        serailstatus = cc1120SpiTRx(buffer, pData);
         while (hspi1.State != HAL_SPI_STATE_READY);
         pData++;
       }
     }
     else
     {
-      cc1120SpiTRx(pData, buffer); // txbuffer'ı öylesine koydum buraya
+      serailstatus = cc1120SpiTRx(buffer, pData);
       while (hspi1.State != HAL_SPI_STATE_READY);
     }
   }
-  return;
+  else
+  {
+    if (addr & RADIO_BURST_ACCESS)
+    {
+      /* Communicate len number of bytes: if TX - the procedure doesn't overwrite pData */
+      for (i = 0; i < len; i++)
+      {
+        serailstatus = cc1120SpiTRx(pData, buffer);
+        while (hspi1.State != HAL_SPI_STATE_READY);
+        pData++;
+      }
+    }
+    else
+    {
+      serailstatus = cc1120SpiTRx(pData, buffer); // txbuffer'ı öylesine koydum buraya
+      while (hspi1.State != HAL_SPI_STATE_READY);
+    }
+  }
+  return serailstatus;
 }

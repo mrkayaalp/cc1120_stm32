@@ -109,6 +109,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     MX_USB_HOST_Init();
     /* USER CODE BEGIN 2 */
 
+    //Initialize CC1120
+
+
 
 
 

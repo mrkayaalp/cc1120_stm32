@@ -47,11 +47,13 @@
 /*!
  * @brief spi communication func. for CC1120
  */
-CC1120_StatusTypeDef cc1120SpiTRx(uint8_t *txbuffer, uint8_t *rxbuffer)
+RfSerialStatus_t cc1120SpiTRx(uint8_t *txbuffer, uint8_t *rxbuffer)
 {
-  CC1120_StatusTypeDef status = CC1120_OK;
+  RfSerialStatus_t status = RF_SERIAL_OK;
 
-      status = HAL_SPI_TransmitRecieve(CC1120_INTF, txbuffer, rxbuffer, 1, CC1120_TIMOUT_ms);
+
+      status = HAL_SPI_TransmitReceive(&hspi1, txbuffer, rxbuffer, 1, 250);
+
 
   return status;
 }
@@ -87,13 +89,13 @@ void cc1120_endTransaction()
  *
  * output parameters
  *
- * @return      rfStatus_t
+ * @return      RfChipStatus_t
  */
-rfStatus_t cc112xSpiReadReg(uint16 addr, uint8 *pData, uint8 len)
+RfChipStatus_t cc112xSpiReadReg(uint16 addr, uint8 *pData, uint8 len)
 {
   uint8 tempExt = (uint8)(addr >> 8);
   uint8 tempAddr = (uint8)(addr & 0x00FF);
-  uint8 rc;
+  RfChipStatus_t chipstatus;
 
   /* Checking if this is a FIFO access -> returns chip not ready  */
   if ((CC112X_SINGLE_TXFIFO <= tempAddr) && (tempExt == 0))
@@ -102,13 +104,13 @@ rfStatus_t cc112xSpiReadReg(uint16 addr, uint8 *pData, uint8 len)
   /* Decide what register space is accessed */
   if (!tempExt)
   {
-    rc = trx8BitRegAccess((RADIO_BURST_ACCESS | RADIO_READ_ACCESS), tempAddr, pData, len);
+    chipstatus = trx8BitRegAccess((RADIO_BURST_ACCESS | RADIO_READ_ACCESS), tempAddr, pData, len);
   }
   else if (tempExt == 0x2F) // extended register space command
   {
-    rc = trx16BitRegAccess((RADIO_BURST_ACCESS | RADIO_READ_ACCESS), tempExt, tempAddr, pData, len);
+    chipstatus = trx16BitRegAccess((RADIO_BURST_ACCESS | RADIO_READ_ACCESS), tempExt, tempAddr, pData, len);
   }
-  return (rc);
+  return (chipstatus);
 }
 
 /******************************************************************************
@@ -126,13 +128,13 @@ rfStatus_t cc112xSpiReadReg(uint16 addr, uint8 *pData, uint8 len)
  *
  * output parameters
  *
- * @return      rfStatus_t
+ * @return      RfChipStatus_t
  */
-rfStatus_t cc112xSpiWriteReg(uint16 addr, uint8 *pData, uint8 len)
+RfChipStatus_t cc112xSpiWriteReg(uint16 addr, uint8 *pData, uint8 len)
 {
   uint8 tempExt = (uint8)(addr >> 8);
   uint8 tempAddr = (uint8)(addr & 0x00FF);
-  uint8 rc;
+  RfChipStatus_t chipstatus;
 
   /* Checking if this is a FIFO access - returns chip not ready */
   if ((CC112X_SINGLE_TXFIFO <= tempAddr) && (tempExt == 0))
@@ -141,13 +143,13 @@ rfStatus_t cc112xSpiWriteReg(uint16 addr, uint8 *pData, uint8 len)
   /* Decide what register space is accessed */
   if (!tempExt)
   {
-    rc = trx8BitRegAccess((RADIO_BURST_ACCESS | RADIO_WRITE_ACCESS), tempAddr, pData, len);
+    chipstatus = trx8BitRegAccess((RADIO_BURST_ACCESS | RADIO_WRITE_ACCESS), tempAddr, pData, len);
   }
   else if (tempExt == 0x2F)
   {
-    rc = trx16BitRegAccess((RADIO_BURST_ACCESS | RADIO_WRITE_ACCESS), tempExt, tempAddr, pData, len);
+    chipstatus = trx16BitRegAccess((RADIO_BURST_ACCESS | RADIO_WRITE_ACCESS), tempExt, tempAddr, pData, len);
   }
-  return (rc);
+  return (chipstatus);
 }
 
 /*******************************************************************************
@@ -162,13 +164,13 @@ rfStatus_t cc112xSpiWriteReg(uint16 addr, uint8 *pData, uint8 len)
  *
  * output parameters
  *
- * @return      rfStatus_t
+ * @return      RfChipStatus_t
  */
-rfStatus_t cc112xSpiWriteTxFifo(uint8 *pData, uint8 len)
+RfChipStatus_t cc112xSpiWriteTxFifo(uint8 *pData, uint8 len)
 {
-  uint8 rc;
-  rc = trx8BitRegAccess(0x00, CC112X_BURST_TXFIFO, pData, len);
-  return (rc);
+  RfChipStatus_t chipstatus;;
+  chipstatus = trx8BitRegAccess(0x00, CC112X_BURST_TXFIFO, pData, len);
+  return (chipstatus);
 }
 
 /*******************************************************************************
@@ -183,13 +185,13 @@ rfStatus_t cc112xSpiWriteTxFifo(uint8 *pData, uint8 len)
  *
  * output parameters
  *
- * @return      rfStatus_t
+ * @return      RfChipStatus_t
  */
-rfStatus_t cc112xSpiReadRxFifo(uint8 *pData, uint8 len)
+RfChipStatus_t cc112xSpiReadRxFifo(uint8 *pData, uint8 len)
 {
-  uint8 rc;
-  rc = trx8BitRegAccess(0x00, CC112X_BURST_RXFIFO, pData, len);
-  return (rc);
+  RfChipStatus_t chipstatus;
+  chipstatus = trx8BitRegAccess(0x00, CC112X_BURST_RXFIFO, pData, len);
+  return (chipstatus);
 }
 
 /******************************************************************************
@@ -213,10 +215,10 @@ rfStatus_t cc112xSpiReadRxFifo(uint8 *pData, uint8 len)
  *
  * output parameters
  *
- * @return  rfStatus_t
+ * @return  RfChipStatus_t
  *
  */
-rfStatus_t cc112xGetTxStatus(void)
+RfChipStatus_t cc112xGetTxStatus(void)
 {
   return (trxSpiCmdStrobe(CC112X_SNOP));
 }
@@ -245,10 +247,10 @@ rfStatus_t cc112xGetTxStatus(void)
  *
  * output parameters
  *
- * @return    rfStatus_t
+ * @return    RfChipStatus_t
  *
  */
-rfStatus_t cc112xGetRxStatus(void)
+RfChipStatus_t cc112xGetRxStatus(void)
 {
   return (trxSpiCmdStrobe(CC112X_SNOP | RADIO_READ_ACCESS));
 }
