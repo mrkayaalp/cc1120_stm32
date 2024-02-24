@@ -1,6 +1,6 @@
 #include "cc1120_intf.h"
 
-cc1120_devTypeDef cc1120_dev;
+
 
 uint16_t rxPacketCounter = 0;
 uint16_t txPacketCounter = 0;
@@ -44,9 +44,6 @@ static void setAmpDirection(cc1120_devTypeDef* cc1120_dev);
 
 /*---------------------Public Functions------------------------*/
 
-
-
-
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
 */
@@ -75,7 +72,7 @@ RfChipStatus_t registerConfig(cc1120_devTypeDef* cc1120_dev) {
 /*!
 * @brief This API initialize the CC1120 radio with the given RF configuration.
 */
-RfChipStatus_t rfinit(cc1120_devTypeDef* cc1120_dev) {
+RfChipStatus_t rfinit(cc1120_devTypeDef *cc1120_dev) {
   RfChipStatus_t chipstatus;
   //Set configuration settings in device
   cc1120_dev->intf = CC1120_INTF;
@@ -94,7 +91,7 @@ RfChipStatus_t rfinit(cc1120_devTypeDef* cc1120_dev) {
     chipstatus = rfSendTxPacket(cc1120_dev, sensorData); //Wait for tx interrupt and send data again
   }
   else {
-    chipstatus = rfInitRx(); // Wait for rx interrupt and receive data
+    chipstatus = rfRunRx(); // Wait for rx interrupt and receive data
   }
   return chipstatus;
 }
@@ -139,6 +136,7 @@ RfChipStatus_t rfRunRx() {
   RfChipStatus_t chipstatus;
   // Strobe RX to receive packet
   chipstatus = trxSpiCmdStrobe(CC112X_SRX);
+  return chipstatus;
 }
 
 /*!
