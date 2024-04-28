@@ -74,7 +74,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     }
     else{
       // Wait for interrupt that packet has been sent.
-      chipstatus = rdSendTxPacket();
+      //chipstatus = rfSendTxPacket();
       HAL_Delay(2);
 
     }
@@ -121,7 +121,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //Initialize CC1120
-  rfinit(cc1120_dev);
+  //rfinit(cc1120_dev);
 
 
 
@@ -133,6 +133,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	 majorTomHere();
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
@@ -190,6 +191,27 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM5 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM5) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

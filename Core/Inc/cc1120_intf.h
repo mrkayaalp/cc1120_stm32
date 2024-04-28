@@ -6,6 +6,9 @@
 
 
 
+
+void majorTomHere();
+
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
 * @param[in] cc1120_devTypeDef - CC1120 pointer device structure

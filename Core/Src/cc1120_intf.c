@@ -44,6 +44,13 @@ static void setAmpDirection(cc1120_devTypeDef* cc1120_dev);
 
 /*---------------------Public Functions------------------------*/
 
+void majorTomHere(){
+  // Major Tom to Ground Control
+  HAL_GPIO_TogglePin(USERLED_GPIO_Port, USERLED_Pin);
+  HAL_GPIO_TogglePin(USERLED2_GPIO_Port, USERLED2_Pin);
+  HAL_Delay(500);
+}
+
 /*!
 * @brief This API confiures the CC1120 radio with the given RF configuration.
 */
